@@ -13,6 +13,7 @@ using json = nlohmann::json;
 using namespace mediasoupclient;
 
 static constexpr uint32_t ProbatorSsrc{ 1234u };
+static const std::string ProbatorMid("probator");
 
 // Static functions declaration.
 static bool isRtxCodec(const json& codec);
@@ -109,7 +110,9 @@ namespace mediasoupclient
 				MSC_THROW_TYPE_ERROR("invalid codec.mimeType");
 
 			// Just override kind with media component of mimeType.
-			codec["kind"] = mimeTypeMatch[1].str();
+			// TODO(HaiyangWu) PR ? seems a bug related to `move` syntax
+			auto mimeKind = mimeTypeMatch[1].str();
+			codec["kind"] = mimeKind;
 
 			// preferredPayloadType is optional.
 			if (preferredPayloadTypeIt != codec.end() && !preferredPayloadTypeIt->is_number_integer())
@@ -1470,7 +1473,7 @@ namespace mediasoupclient
 			// clang-format off
 			json rtpParameters =
 			{
-				{ "mid",              nullptr        },
+				{ "mid",              ProbatorMid    },
 				{ "codecs",           json::array()  },
 				{ "headerExtensions", json::array()  },
 				{ "encodings",        json::array()  },
